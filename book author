@@ -1,0 +1,137 @@
+MariaDB [db1]> create table author(id int primary key,name varchar(50),city varchar(20),country varchar(20));
+Query OK, 0 rows affected (0.22 sec)
+
+MariaDB [db1]> create table publisher(p_id int primary key,p_name varchar(40),p_city varchar(20),p_country varchar(20));
+Query OK, 0 rows affected (0.24 sec)
+
+MariaDB [db1]> create table category(c_id int primary key,des varchar(30));
+Query OK, 0 rows affected (0.22 sec)
+
+MariaDB [db1]> create table books(book_id int,title varchar(30),id int references author,p_id int references publisher,c_id int references category,year int,price int);
+Query OK, 0 rows affected (0.25 sec)
+
+MariaDB [db1]> insert into author values(100,'Pulo coelo','Sao paulo','Brazil');
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [db1]> insert into author values(101,'R.K Narayan','Malgudi','India');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into author values(102,'APJ Kalam','Tamilnadu','India');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into author values(103,'Madhavikutty','Palakkad','India');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into publisher values(39,'DC Books','Sao paulo','Brazil');
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [db1]> insert into publisher values(23,'Unique','Malgudi','India');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into publisher values(45,'DC Books','Tamilnadu','India');
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [db1]> insert into publisher values(25,'Kerala bookstore','Trivandrum','India');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into category values(1001,'Novel');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into category values(1003,'Novel');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into category values(1010,'Autobiography');
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into category values(1111,'Short story');
+Query OK, 1 row affected (0.02 sec)
+
+MariaDB [db1]> insert into books values(12,'Alchemist',100,39,1001,1997,350);
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [db1]> insert into books values(13,'The guide',101,23,1003,1996,600);
+Query OK, 1 row affected (0.04 sec)
+
+MariaDB [db1]> insert into books values(19,'My India',102,45,1010,1995,750);
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> insert into books values(20,'Balyakala smaranakal',103,25,1111,1998,800);
+Query OK, 1 row affected (0.03 sec)
+
+MariaDB [db1]> alter table books modify book_id int primary key;
+Query OK, 4 rows affected (0.67 sec)               
+Records: 4  Duplicates: 0  Warnings: 0
+
+MariaDB [db1]> select * from books;
++---------+----------------------+------+------+------+------+-------+
+| book_id | title                | id   | p_id | c_id | year | price |
++---------+----------------------+------+------+------+------+-------+
+|      12 | Alchemist            |  100 |   39 | 1001 | 1997 |   350 |
+|      13 | The guide            |  101 |   23 | 1003 | 1996 |   600 |
+|      19 | My India             |  102 |   45 | 1010 | 1995 |   750 |
+|      20 | Balyakala smaranakal |  103 |   25 | 1111 | 1998 |   800 |
++---------+----------------------+------+------+------+------+-------+
+4 rows in set (0.00 sec)
+
+MariaDB [db1]> select book_id,title,price from books;
++---------+----------------------+-------+
+| book_id | title                | price |
++---------+----------------------+-------+
+|      12 | Alchemist            |   350 |
+|      13 | The guide            |   600 |
+|      19 | My India             |   750 |
+|      20 | Balyakala smaranakal |   800 |
++---------+----------------------+-------+
+4 rows in set (0.00 sec)
+
+MariaDB [db1]> select title from books b left join category c on b.c_id=c.c_id where c.des!='novel';
++----------------------+
+| title                |
++----------------------+
+| My India             |
+| Balyakala smaranakal |
++----------------------+
+2 rows in set (0.00 sec)
+
+MariaDB [db1]> select title from books where price>500;
++----------------------+
+| title                |
++----------------------+
+| The guide            |
+| My India             |
+| Balyakala smaranakal |
++----------------------+
+3 rows in set (0.00 sec)
+
+MariaDB [db1]> select * from books where title like 'B%';
++---------+----------------------+------+------+------+------+-------+
+| book_id | title                | id   | p_id | c_id | year | price |
++---------+----------------------+------+------+------+------+-------+
+|      20 | Balyakala smaranakal |  103 |   25 | 1111 | 1998 |   800 |
++---------+----------------------+------+------+------+------+-------+
+1 row in set (0.00 sec)
+
+MariaDB [db1]> select title,author.name,publisher.p_name from books left join author on author.id=books.id left join publisher on publisher.p_id=books.p_id where year in(1996,1997,1998);
++----------------------+--------------+------------------+
+| title                | name         | p_name           |
++----------------------+--------------+------------------+
+| Alchemist            | Pulo coelo   | DC Books         |
+| The guide            | R.K Narayan  | Unique           |
+| Balyakala smaranakal | Madhavikutty | Kerala bookstore |
++----------------------+--------------+------------------+
+3 rows in set (0.00 sec)
+
+MariaDB [db1]> select * from books where price between 600 and 800;
++---------+----------------------+------+------+------+------+-------+
+| book_id | title                | id   | p_id | c_id | year | price |
++---------+----------------------+------+------+------+------+-------+
+|      13 | The guide            |  101 |   23 | 1003 | 1996 |   600 |
+|      19 | My India             |  102 |   45 | 1010 | 1995 |   750 |
+|      20 | Balyakala smaranakal |  103 |   25 | 1111 | 1998 |   800 |
++---------+----------------------+------+------+------+------+-------+
+3 rows in set (0.00 sec)
+
+
+
+
+
