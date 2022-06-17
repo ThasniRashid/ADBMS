@@ -1,0 +1,37 @@
+> use inventory;
+switched to db inventory
+> db.createCollection("orders");
+{ "ok" : 1 }
+> db.orders.insert({custid:200,name:"Maya",item:"rice",price:340})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({custid:201,name:"Manu",item:"rice",price:340})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({custid:202,name:"Meera",item:"Sugar",price:150})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({custid:202,name:"Meera",item:"Wheat",price:250})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({custid:200,name:"Maya",item:"Wheat",price:250})
+WriteResult({ "nInserted" : 1 })
+{ "_id" : ObjectId("62ac92ca2e1dc58bb58c8970"), "custid" : 201, "name" : "Manu", "item" : "rice", "price" : 340 }
+{ "_id" : ObjectId("62ac92f62e1dc58bb58c8971"), "custid" : 202, "name" : "Meera", "item" : "Sugar", "price" : 150 }
+{ "_id" : ObjectId("62ac93232e1dc58bb58c8972"), "custid" : 202, "name" : "Meera", "item" : "Wheat", "price" : 250 }
+{ "_id" : ObjectId("62ac93452e1dc58bb58c8973"), "custid" : 200, "name" : "Maya", "item" : "Wheat", "price" : 250 }
+{ "_id" : ObjectId("62ac93f22e1dc58bb58c8974"), "custid" : 200, "name" : "Maya", "item" : "rice", "price" : 340 }
+> var mapFunction=function(){emit(this.custid,this.price);};
+> var reduceFunction=function(key,values){return Array.sum(values);};
+> db.order.mapReduce(mapFunction,reduceFunction,{'out':"map_example"})
+{ "result" : "map_example", "ok" : 1 }
+> db.map_example.find();
+{ "_id" : 202, "value" : 400 }
+{ "_id" : 201, "value" : 340 }
+{ "_id" : 200, "value" : 590 }
+>db.order.mapReduce(mapFunction,reduceFunction,{query:{custid:{$gt:201}},out: "map_example1"})
+{ "result" : "map_example1", "ok" : 1 }
+> db.map_example1.find()
+{ "_id" : 202, "value" : 200 }
+
+
+
+
+
+
